@@ -1,14 +1,10 @@
-# logfit-sveltekit-app
+# mapspeed-sveltekit-app
 
-Logfit Crossfit Application
-
-## About
-
-This Application was developed free of charge for [Crossfit Willemstad](crossfitwillemstad.com)
+M.A.P. Speed Official Application
 
 ## Live Site
 
-[Logfit Crossfit App](https://logfitwillemstad.netlify.app)
+[Logfit Crossfit App](https://mapspeed.netlify.app)
 
 ### Tools
 
