@@ -122,7 +122,7 @@
 	});
 </script>
 
-<PageHeader label="Rankings" subLabel="View Current Rankings" />
+<PageHeader label="Dashboard" subLabel="View General Information" />
 <SurfaceContainer>
 	<SurfaceHeader label="Totals" />
 	<Table interactive source={grandTotalTableData} on:selected={onTableRowSelect} />

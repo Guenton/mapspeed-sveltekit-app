@@ -2,4 +2,4 @@
 	export let label: string;
 </script>
 
-<p class="mb-3 text-sm text-primary-500">{label}</p>
+<p class="mb-3 text-sm text-secondary-700">{label}</p>

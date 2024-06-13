@@ -5,10 +5,10 @@
 </script>
 
 <TabGroup
-	class="bg-transparent w-full text-secondary-500 dark:text-tertiary-500"
+	class="bg-transparent w-full"
 	justify="justify-center"
-	active="underline hover:text-primary-500"
-	hover="hover:text-primary-500"
+	active="underline hover:text-secondary-500"
+	hover="hover:text-secondary-500"
 	flex="flex-1 lg:flex-none"
 	rounded=""
 	border=""
@@ -18,10 +18,10 @@
 	</TabAnchor>
 
 	<TabAnchor href={logsPage} selected={$page.url.pathname.startsWith(logsPage)}>
-		<span>Logs</span>
+		<span>Vehicles</span>
 	</TabAnchor>
 
 	<TabAnchor href={statsPage} selected={$page.url.pathname.startsWith(statsPage)}>
-		<span>Stats</span>
+		<span>History</span>
 	</TabAnchor>
 </TabGroup>

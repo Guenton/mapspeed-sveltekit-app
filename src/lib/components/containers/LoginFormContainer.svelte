@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { LightSwitch } from '@skeletonlabs/skeleton';
 	import FlatAlert from '$lib/components/content/FlatAlert.svelte';
-	import LogoWstad from '$lib/components/images/LogoWstad.svelte';
 	import SubHeader from '../content/SubHeader.svelte';
 	import LogoGuenton from '../images/LogoGuenton.svelte';
-	import BannerLogfit from '../images/BannerLogfit.svelte';
+	import Banner from '../images/Banner.svelte';
 	import { isDarkModeState } from '$lib/store';
 
 	export let label: string;
@@ -13,7 +12,7 @@
 
 <div class="flex flex-col justify-items-center w-full p-10">
 	<div class="flex flex-col items-center my-4">
-		<BannerLogfit />
+		<Banner />
 		<SubHeader {label} />
 	</div>
 
@@ -26,13 +25,20 @@
 	</div>
 
 	<div class="w-full flex justify-between items-center self-center mt-4 max-w-lg">
-		<a href="http://www.crossfitwillemstad.com/" target="_blank"><LogoWstad /></a>
-		<LightSwitch
-			ring="border-none"
-			fillDark="fill-primary-500"
-			fillLight="fill-tertiary-500"
-			on:click={toggleDarkMode}
-		/>
 		<a href="mailto:guenton@gmail.com"><LogoGuenton /></a>
+		<div class="flex gap-1 items-center">
+			{#if $isDarkModeState}
+				<span class="text-xs">Go Light</span>
+			{:else}
+				<span class="text-xs">Go Dark</span>
+			{/if}
+			<LightSwitch
+				ring="border-none"
+				on:click={toggleDarkMode}
+				fillLight="text-black"
+				bgLight="bg-secondary-500 dark:bg-surface-700"
+				bgDark="bg-surface-300 dark:bg-secondary-500"
+			/>
+		</div>
 	</div>
 </div>
