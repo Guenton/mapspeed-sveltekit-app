@@ -4,7 +4,7 @@ M.A.P. Speed Official Application
 
 ## Live Site
 
-[Logfit Crossfit App](https://mapspeed.netlify.app)
+[MapSpeed - Web](https://mapspeed.netlify.app)
 
 ### Tools
 
