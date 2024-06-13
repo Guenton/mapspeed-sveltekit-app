@@ -8,6 +8,6 @@
 	const click = () => dispatch('click');
 </script>
 
-<button class="btn btn-icon bg-transparent dark:text-secondary-500" {disabled} on:click={click}>
+<button class="btn btn-icon bg-transparent dark:text-white" {disabled} on:click={click}>
 	<slot><IconGestureTap /></slot>
 </button>

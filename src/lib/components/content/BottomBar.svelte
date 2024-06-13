@@ -2,16 +2,17 @@
 	import { AppBar } from '@skeletonlabs/skeleton';
 
 	import LogoGuenton from '../images/LogoGuenton.svelte';
-	import Banner from '../images/Banner.svelte';
+	import BannerSmall from '../images/BannerSmall.svelte';
 </script>
 
 <AppBar>
 	<svelte:fragment slot="lead">
+		<a href="http://www.crossfitwillemstad.com/" target="_blank"><BannerSmall /></a>
 		<p class="ml-5 text-sm">Copyright © 2024. M.A.P. Speed</p>
 	</svelte:fragment>
 
 	<svelte:fragment slot="trail">
-		<p class="text-xs">Powered By</p>
+		<p class="text-sm">Powered By</p>
 		<a href="mailto:guenton@gmail.com"><LogoGuenton /></a>
 	</svelte:fragment>
 </AppBar>
