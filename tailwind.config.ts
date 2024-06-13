@@ -3,7 +3,7 @@ import type { Config } from 'tailwindcss';
 import forms from '@tailwindcss/forms';
 import typography from '@tailwindcss/typography';
 import { skeleton } from '@skeletonlabs/tw-plugin';
-import { fitlogTheme, alchemyColors } from './src/lib/theme/colors';
+import { mapSpeedTheme, alchemyColors } from './src/lib/theme/colors';
 
 export default {
 	darkMode: 'class',
@@ -27,7 +27,7 @@ export default {
 						enhancements: true,
 					},
 				],
-				custom: [fitlogTheme],
+				custom: [mapSpeedTheme],
 			},
 		}),
 	],
