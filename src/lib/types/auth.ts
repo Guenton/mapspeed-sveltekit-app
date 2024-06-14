@@ -10,6 +10,7 @@ export type FirebaseUserShortInfoFormat = {
 export type FirebaseDatabaseUserFormat = {
 	uid: string;
 	email: string;
+	phone: string;
 	firstName: string;
 	lastName: string;
 	isAdmin: boolean;

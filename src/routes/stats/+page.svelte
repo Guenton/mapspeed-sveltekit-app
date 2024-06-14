@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { authLoginPage, logsPage } from '$utils/pages';
+	import { authLoginPage, vehiclesPage } from '$utils/pages';
 	import { getFirebaseUserId } from '$lib/firebase/auth';
 	import PageHeader from '$lib/components/content/PageHeader.svelte';
 	import SurfaceContainer from '$lib/components/containers/SurfaceContainer.svelte';
@@ -48,7 +48,7 @@
 	$: myTableData = myLogTable && setMyTableSource();
 	$: allTableData = allLogTable && setAllTableSource();
 
-	const onTableRowSelect = (event: CustomEvent) => goto(`${logsPage}/${event.detail}`);
+	const onTableRowSelect = (event: CustomEvent) => goto(`${vehiclesPage}/${event.detail}`);
 
 	onMount(() => {
 		const userId = getFirebaseUserId();

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { AppBar } from '@skeletonlabs/skeleton';
 	import IconLogout from '~icons/mdi/logout-variant';
 	import IconAccount from '~icons/mdi/account';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import type { HTMLInputAttributes } from 'svelte/elements';
-	import IconPencil from '~icons/mdi/pencil';
+	import IconCarInfo from '~icons/mdi/car-info';
 
 	export let value: string = '';
 	export let disabled: boolean = false;
@@ -16,7 +16,7 @@
 
 <div class="input-group input-group-divider border-none grid-cols-[auto_1fr_auto]">
 	<div class="input-group-shim">
-		<slot><IconPencil /></slot>
+		<slot><IconCarInfo /></slot>
 	</div>
 	<input
 		class="input border-none rounded-none"

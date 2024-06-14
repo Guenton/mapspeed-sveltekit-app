@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import PrivacyPolicy from '$lib/components/content/PrivacyPolicy.svelte';
 	import { LightSwitch } from '@skeletonlabs/skeleton';
 </script>

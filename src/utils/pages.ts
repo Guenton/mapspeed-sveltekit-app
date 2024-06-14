@@ -9,8 +9,8 @@ export const authUserPage = '/auth/user';
 // HOME
 export const homePage = '/home';
 
-// LOGS
-export const logsPage = '/logs';
+// VEHICLES
+export const vehiclesPage = '/vehicles';
 
 // STATS
 export const statsPage = '/stats';

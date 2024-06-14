@@ -1,15 +1,16 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import LoginButton from '$lib/components/buttons/LoginButton.svelte';
+	import IconLogin from '~icons/mdi/login-variant';
 	import EmailInput from '$lib/components/inputs/EmailInput.svelte';
 	import LoginContainer from '$lib/components/containers/LoginContainer.svelte';
 	import LoginFormContainer from '$lib/components/containers/LoginFormContainer.svelte';
 	import PasswordInput from '$lib/components/inputs/PasswordInput.svelte';
-	import { analyticSignUpRequest } from '$lib/firebase/analytics';
-	import { firebasePasswordSignUp } from '$lib/firebase/auth';
-	import isValidSignupFormat from '$lib/validation/isValidSignupFormat';
+	import MaterialPrimaryButton from '$lib/components/buttons/MaterialPrimaryButton.svelte';
 
+	import { goto } from '$app/navigation';
+	import { firebasePasswordSignUp } from '$lib/firebase/auth';
+	import { analyticSignUpRequest } from '$lib/firebase/analytics';
 	import { authLoginPage, homePage, policyPage } from '$utils/pages';
+	import isValidSignupFormat from '$lib/validation/isValidSignupFormat';
 
 	let email = '';
 	let password = '';
@@ -41,7 +42,9 @@
 			placeholder="Confirm Password"
 		/>
 
-		<LoginButton on:click={signup} />
+		<MaterialPrimaryButton label="Sign Up" on:click={signup}>
+			<IconLogin />
+		</MaterialPrimaryButton>
 
 		<div class="flex gap-1 justify-center">
 			<p class="text-xs">Already have an account?</p>

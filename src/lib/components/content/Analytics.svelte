@@ -54,7 +54,7 @@
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-E73RL4BHVB"></script>
 
 	<!-- Google Analytics Configuration -->
-	<script>
+	<script lang="ts">
 		try {
 			window.dataLayer = window.dataLayer || [];
 

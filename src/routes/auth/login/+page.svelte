@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import IconLogin from '~icons/mdi/login-variant';
 	import GoogleSigninButton from '$lib/components/buttons/GoogleSigninButton.svelte';
-	import LoginButton from '$lib/components/buttons/LoginButton.svelte';
 	import EmailInput from '$lib/components/inputs/EmailInput.svelte';
 	import LoginContainer from '$lib/components/containers/LoginContainer.svelte';
 	import LoginFormContainer from '$lib/components/containers/LoginFormContainer.svelte';
@@ -13,6 +13,7 @@
 	import { authForgotPage, authSignupPage, homePage, policyPage } from '$utils/pages';
 	import { analyticEmailAndPasswordSignIn, analyticGoogleSignIn } from '$lib/firebase/analytics';
 	import { firebasePasswordSignIn, googleSignInRedirect } from '$lib/firebase/auth';
+	import MaterialPrimaryButton from '$lib/components/buttons/MaterialPrimaryButton.svelte';
 
 	let email: string = '';
 	let password: string = '';
@@ -54,7 +55,9 @@
 			</p>
 		</div>
 
-		<LoginButton on:click={login} />
+		<MaterialPrimaryButton label="Login" on:click={login}>
+			<IconLogin />
+		</MaterialPrimaryButton>
 
 		<div class="flex gap-1 justify-center">
 			<p class="text-xs">Don't have an account?</p>

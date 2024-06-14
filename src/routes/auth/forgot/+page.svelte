@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import ResetButton from '$lib/components/buttons/ResetButton.svelte';
+	import IconAccountSync from '~icons/mdi/account-sync';
 	import EmailInput from '$lib/components/inputs/EmailInput.svelte';
 	import LoginContainer from '$lib/components/containers/LoginContainer.svelte';
 	import LoginFormContainer from '$lib/components/containers/LoginFormContainer.svelte';
@@ -9,8 +8,10 @@
 	import { alertTextState, alertTypeState } from '$lib/store';
 	import isValidEmailFormat from '$lib/validation/isValidEmailFormat';
 
+	import { goto } from '$app/navigation';
 	import { authLoginPage, policyPage } from '$utils/pages';
 	import { onMount } from 'svelte';
+	import MaterialSecondaryButton from '$lib/components/buttons/MaterialSecondaryButton.svelte';
 
 	let email = '';
 
@@ -36,7 +37,9 @@
 	<LoginFormContainer label="Please enter your email to request a reset">
 		<EmailInput bind:ref={emailRef} bind:value={email} on:enter={requestReset} />
 
-		<ResetButton on:click={requestReset} />
+		<MaterialSecondaryButton label="Request Reset" on:click={requestReset}>
+			<IconAccountSync />
+		</MaterialSecondaryButton>
 
 		<div class="flex gap-1 justify-center">
 			<p class="text-xs">Remember your password?</p>

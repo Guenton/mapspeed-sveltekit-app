@@ -22,7 +22,6 @@ Docs:
 import axios, { AxiosError } from 'axios';
 import { isLoadingState } from '../lib/store';
 import { browser } from '$app/environment';
-import type { StrapiErrorFormat } from '$lib/types/strapi';
 
 // Set Axios defaults
 const baseURL = import.meta.env.VITE_FAPPI_BASE_URL;
@@ -148,12 +147,6 @@ const axiosErrorHandler = (error: AxiosError) => {
 	} else if (error.code === 'ECONNREFUSED') {
 		console.warn('📞 AXIOS - Connection Error: ' + error);
 		return new Error('Your connection with the server was refused, please try again later');
-	} else if (error.response && typeof error.response.data === 'object') {
-		// Acomodate Strapi Specific Error inside the Axios Error.
-		const cmsError = error.response.data as StrapiErrorFormat | StrapiErrorFormat;
-		const strapiError = formatStrapiError(cmsError);
-		console.warn('🗃️ CMS - Response Error: ' + strapiError);
-		return new Error(strapiError);
 	} else if (error.response && error.response.data) {
 		console.warn('📞 AXIOS - Response Error: ' + error.response.data);
 		return new Error(error.response.data.toString());
@@ -167,12 +160,4 @@ const axiosErrorHandler = (error: AxiosError) => {
 		console.warn('📞 AXIOS - General Error: ' + error);
 		return new Error('There was an error processing your request');
 	}
-};
-
-/** Format an asumed strapi error into a string */
-const formatStrapiError = (strapiError: StrapiErrorFormat | StrapiErrorFormat[] | null) => {
-	if (!strapiError) return 'An Unknown CMS Error occurred';
-	if (Array.isArray(strapiError)) return strapiError[0].message;
-	if (Array.isArray(strapiError.message)) return strapiError.message[0].messages[0].message;
-	else return strapiError.message;
 };

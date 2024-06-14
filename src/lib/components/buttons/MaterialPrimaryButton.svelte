@@ -1,7 +1,8 @@
-<script>
+<script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import IconAccountPlus from '~icons/mdi/account-plus';
+	import IconSend from '~icons/mdi/send';
 
+	export let label = 'Submit';
 	export let disabled = false;
 
 	const dispatch = createEventDispatcher();
@@ -9,10 +10,10 @@
 </script>
 
 <button
-	class="btn px-6 variant-filled-primary dark:variant-filled-secondary w-full max-w-md"
+	class="btn px-6 bg-gradient-to-t variant-gradient-tertiary-primary w-full max-w-md"
 	{disabled}
 	on:click={click}
 >
-	<span>Sign Up</span>
-	<IconAccountPlus />
+	<span>{label}</span>
+	<slot><IconSend /></slot>
 </button>

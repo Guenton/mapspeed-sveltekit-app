@@ -2,10 +2,10 @@
 	import LoginContainer from '$lib/components/containers/LoginContainer.svelte';
 	import LoginFormContainer from '$lib/components/containers/LoginFormContainer.svelte';
 	import MaterialInput from '$lib/components/inputs/MaterialInput.svelte';
-	import SecureEmailCheckBox from '$lib/components/inputs/SecureEmailCheckBox.svelte';
-	import SubmitButton from '$lib/components/buttons/SubmitButton.svelte';
+	import MaterialPrimaryButton from '$lib/components/buttons/MaterialPrimaryButton.svelte';
 
 	import IconAt from '~icons/mdi/at';
+	import IconPhone from '~icons/mdi/phone';
 	import IconAccount from '~icons/mdi/account';
 	import type { FirebaseDatabaseUserFormat } from '$lib/types/auth';
 	import { onMount } from 'svelte';
@@ -24,13 +24,7 @@
 	let firstName = '';
 	let lastName = '';
 	let email = '';
-
-	let isSecuredEmail = true;
-	$: setEmailValue(isSecuredEmail);
-
-	const setEmailValue = (isSecured: boolean) => {
-		email = isSecured ? '******' : getFirebaseUserEmail();
-	};
+	let phone = '';
 
 	let firstNameRef: HTMLInputElement;
 	let lastNameRef: HTMLInputElement;
@@ -43,6 +37,8 @@
 		const fullName = getFirebaseDisplayName();
 		if (!fullName) return;
 		[firstName, lastName] = fullName.split(' ');
+
+		email = getFirebaseUserEmail();
 	});
 
 	const store = () => {
@@ -51,6 +47,7 @@
 			firstName,
 			lastName,
 			email,
+			phone,
 			isAdmin: false,
 		};
 		if (!isValidFirebaseUserFormat(userFormat)) return;
@@ -79,17 +76,19 @@
 			bind:ref={lastNameRef}
 			name="lastName"
 			placeholder="Last Name"
-		/>
+		>
+			<IconAccount />
+		</MaterialInput>
 
-		<div class="flex flex-col gap-2 items-center">
-			<MaterialInput bind:value={email} name="email" placeholder="Email" disabled>
-				<IconAt />
-			</MaterialInput>
+		<MaterialInput bind:value={email} name="email" placeholder="Email">
+			<IconAt />
+		</MaterialInput>
 
-			<SecureEmailCheckBox bind:value={isSecuredEmail} />
-		</div>
+		<MaterialInput bind:value={phone} name="phone" placeholder="Phone">
+			<IconPhone />
+		</MaterialInput>
 
-		<SubmitButton on:click={store} />
+		<MaterialPrimaryButton on:click={store} />
 
 		<p class="text-xs text-center">
 			<a class="anchor text-surface-300 dark:text-surface-400" href={policyPage}>Privacy Policy</a>

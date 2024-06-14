@@ -1,14 +1,17 @@
 <script lang="ts">
+	import IconAt from '~icons/mdi/at';
+	import IconPhone from '~icons/mdi/phone';
+	import IconAccount from '~icons/mdi/account';
 	import PageHeader from '$lib/components/content/PageHeader.svelte';
 	import SurfaceContainer from '$lib/components/containers/SurfaceContainer.svelte';
 	import SurfaceHeader from '$lib/components/content/SurfaceHeader.svelte';
 	import MaterialInput from '$lib/components/inputs/MaterialInput.svelte';
-	import SubmitButton from '$lib/components/buttons/SubmitButton.svelte';
-	import SecureEmailCheckBox from '$lib/components/inputs/SecureEmailCheckBox.svelte';
 
+	import type { FirebaseDatabaseUserFormat } from '$lib/types/auth';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { authLoginPage, homePage, rootPage } from '$utils/pages';
+	import isValidFirebaseUserFormat from '$lib/validation/isValidFirebaseUserFormat';
 	import { analyticsDeleteUserEvent, analyticsUpdateUserEvent } from '$lib/firebase/analytics';
 	import {
 		firebaseSignOut,
@@ -18,23 +21,14 @@
 		removeFirebaseUserAsync,
 		storeFirebaseUserAsync,
 	} from '$lib/firebase/auth';
-	import IconAccount from '~icons/mdi/account';
-	import IconAt from '~icons/mdi/at';
-	import isValidFirebaseUserFormat from '$lib/validation/isValidFirebaseUserFormat';
-	import type { FirebaseDatabaseUserFormat } from '$lib/types/auth';
-	import DeleteButton from '$lib/components/buttons/DeleteButton.svelte';
+	import MaterialPrimaryButton from '$lib/components/buttons/MaterialPrimaryButton.svelte';
+	import MaterialTertiaryButton from '$lib/components/buttons/MaterialTertiaryButton.svelte';
 
 	let uid = '';
 	let firstName = '';
 	let lastName = '';
 	let email = '';
-
-	let isSecuredEmail = true;
-	$: setEmailValue(isSecuredEmail);
-
-	const setEmailValue = (isSecured: boolean) => {
-		email = isSecured ? '******' : getFirebaseUserEmail();
-	};
+	let phone = '';
 
 	let firstNameRef: HTMLInputElement;
 	let lastNameRef: HTMLInputElement;
@@ -47,6 +41,8 @@
 		const fullName = getFirebaseDisplayName();
 		if (!fullName) return;
 		[firstName, lastName] = fullName.split(' ');
+
+		email = getFirebaseUserEmail();
 	});
 
 	const store = () => {
@@ -55,6 +51,7 @@
 			firstName,
 			lastName,
 			email,
+			phone,
 			isAdmin: false,
 		};
 		if (!isValidFirebaseUserFormat(userFormat)) return;
@@ -95,17 +92,17 @@
 			placeholder="Last Name"
 		/>
 
-		<div class="flex flex-col gap-2 items-center">
-			<MaterialInput bind:value={email} name="email" placeholder="Email" disabled>
-				<IconAt />
-			</MaterialInput>
+		<MaterialInput bind:value={email} name="email" placeholder="Email" disabled>
+			<IconAt />
+		</MaterialInput>
 
-			<SecureEmailCheckBox bind:value={isSecuredEmail} />
-		</div>
+		<MaterialInput value={phone} name="phone" placeholder="Phone" disabled>
+			<IconPhone />
+		</MaterialInput>
 	</div>
 
 	<div class="flex items-center justify-center gap-8 my-5 mx-4 mt-8">
-		<SubmitButton on:click={store} />
-		<DeleteButton on:click={purge} />
+		<MaterialPrimaryButton on:click={store} />
+		<MaterialTertiaryButton on:click={purge} />
 	</div>
 </SurfaceContainer>

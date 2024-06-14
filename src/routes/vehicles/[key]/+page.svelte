@@ -18,11 +18,20 @@
 	import MaterialInput from '$lib/components/inputs/MaterialInput.svelte';
 	import type { Unsubscriber } from 'svelte/store';
 	import { onValue } from 'firebase/database';
-	import type { FirebaseDatabaseUserFormat } from '$lib/types/auth';
 	import type { FirebaseWorkoutLogFormat } from '$lib/types/log';
 	import isValidFirebaseWorkoutLogFormat from '$lib/validation/isValidFirebaseWorkoutLogFormat';
-	import { storeNewFirebaseWorkoutLogAsync } from '$lib/firebase/log';
-	import { analyticsLogEntryEvent } from '$lib/firebase/analytics';
+	import {
+		getWorkoutLogRef,
+		removeFirebaseWorkoutLogAsync,
+		updateFirebaseWorkoutLogAsync,
+	} from '$lib/firebase/log';
+	import { page } from '$app/stores';
+	import DeleteButton from '$lib/components/buttons/DeleteButton.svelte';
+	import { analyticsLogEditEvent } from '$lib/firebase/analytics';
+	import MaterialSecondaryButton from '$lib/components/buttons/MaterialSecondaryButton.svelte';
+	import MaterialTertiaryButton from '$lib/components/buttons/MaterialTertiaryButton.svelte';
+
+	const key = $page.params.key;
 
 	let date: string = '';
 	let duration: number;
@@ -37,8 +46,8 @@
 	let unsubUserInformation: Unsubscriber;
 
 	const store = () => {
-		uid = getFirebaseUserId();
-		if (!uid) goto(authLoginPage);
+		const userId = getFirebaseUserId();
+		if (!userId) goto(authLoginPage);
 
 		const logFormat: FirebaseWorkoutLogFormat = {
 			uid,
@@ -52,32 +61,43 @@
 		};
 		if (!isValidFirebaseWorkoutLogFormat(logFormat)) return;
 
-		storeNewFirebaseWorkoutLogAsync(logFormat)
+		updateFirebaseWorkoutLogAsync(key, logFormat)
 			.then(() => goto(homePage))
 			.catch(() => null)
-			.finally(() => analyticsLogEntryEvent(uid));
+			.finally(() => analyticsLogEditEvent(getFirebaseUserId()));
+	};
+
+	const remove = () => {
+		removeFirebaseWorkoutLogAsync(key, uid)
+			.then(() => goto(homePage))
+			.catch(() => {})
+			.finally(() => analyticsLogEditEvent(getFirebaseUserId()));
 	};
 
 	onMount(() => {
-		uid = getFirebaseUserId();
-		if (!uid) goto(authLoginPage);
+		if (!key) console.log('Invalid key');
 
-		unsubUserInformation = onValue(getUserRef(uid), (snapshot) => {
+		unsubUserInformation = onValue(getWorkoutLogRef(key), (snapshot) => {
 			if (!snapshot.exists()) return;
 
-			const data = snapshot.val() as FirebaseDatabaseUserFormat;
+			const data = snapshot.val() as FirebaseWorkoutLogFormat;
+			uid = data.uid;
 			firstName = data.firstName;
 			lastName = data.lastName;
 			email = data.email;
+			date = data.date;
+			duration = data.duration;
+			reps = data.reps;
+			remarks = data.remarks;
 		});
 	});
 
 	onDestroy(() => unsubUserInformation());
 </script>
 
-<PageHeader label="Logs" subLabel="Enter a new workout log" />
+<PageHeader label="Logs" subLabel="Edit Workout with Log Id: {key}" />
 <SurfaceContainer>
-	<SurfaceHeader label="New Entry" />
+	<SurfaceHeader label="Entry Information" />
 	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 m-4">
 		<DateInput bind:value={date} />
 		<TimeInput bind:value={duration} />
@@ -107,6 +127,7 @@
 	</div>
 
 	<div class="flex items-center justify-center gap-8 my-5 mx-4 mt-8">
-		<SubmitButton on:click={store} />
+		<MaterialSecondaryButton on:click={store} />
+		<MaterialTertiaryButton on:click={remove} />
 	</div>
 </SurfaceContainer>
