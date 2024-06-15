@@ -1,9 +1,4 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
-	import { goto } from '$app/navigation';
-	import { authLoginPage, homePage, statsPage } from '$utils/pages';
-	import { getFirebaseUserId, getUserRef } from '$lib/firebase/auth';
-
 	import IconComment from '~icons/mdi/comment-processing';
 	import IconAccount from '~icons/mdi/account';
 	import IconAt from '~icons/mdi/at';
@@ -11,25 +6,30 @@
 	import IconId from '~icons/mdi/identifier';
 	import IconABC from '~icons/mdi/alphabetical-variant';
 	import IconCarSearch from '~icons/mdi/car-search';
-	import IconCarInfo from '~icons/mdi/car-info';
+	import IconCarCog from '~icons/mdi/car-cog';
 	import PageHeader from '$lib/components/content/PageHeader.svelte';
 	import SurfaceContainer from '$lib/components/containers/SurfaceContainer.svelte';
 	import SurfaceHeader from '$lib/components/content/SurfaceHeader.svelte';
 	import MaterialInput from '$lib/components/inputs/MaterialInput.svelte';
-	import type { Unsubscriber } from 'svelte/store';
-	import { onValue } from 'firebase/database';
-	import type { FirebaseDatabaseUserFormat } from '$lib/types/auth';
-	import type { FirebaseWorkoutLogFormat } from '$lib/types/log';
-	import isValidFirebaseWorkoutLogFormat from '$lib/validation/isValidFirebaseWorkoutLogFormat';
-	import { storeNewFirebaseWorkoutLogAsync } from '$lib/firebase/log';
-	import { analyticsLogEntryEvent } from '$lib/firebase/analytics';
-	import isValidVinFormat from '$lib/validation/isValidVinFormat';
-	import decodeVinWithNhtsa from '$lib/services/decodeVinWithNhtsa';
 	import MaterialPrimaryButton from '$lib/components/buttons/MaterialPrimaryButton.svelte';
 	import MaterialSecondaryButton from '$lib/components/buttons/MaterialSecondaryButton.svelte';
-	import { storeNewFirebaseVehicleAsync } from '$lib/firebase/vehicle';
-	import type { FirebaseVehicleInfoFormat } from '$lib/types/vehicle';
 
+	import type { Unsubscriber } from 'svelte/store';
+	import type { FirebaseDatabaseUserFormat } from '$lib/types/auth';
+	import type { FirebaseVehicleFormat } from '$lib/types/vehicle';
+
+	import { goto } from '$app/navigation';
+	import { onValue } from 'firebase/database';
+	import { onDestroy, onMount } from 'svelte';
+	import { authLoginPage, homePage } from '$utils/pages';
+	import { getFirebaseUserId, getUserRef } from '$lib/firebase/auth';
+	import { analyticsLogEntryEvent } from '$lib/firebase/analytics';
+	import { storeNewFirebaseVehicleAsync } from '$lib/firebase/vehicle';
+	import decodeVinWithNhtsa from '$lib/services/decodeVinWithNhtsa';
+	import isValidVinFormat from '$lib/validation/isValidVinFormat';
+	import isValidFirebaseVehicleFormat from '$lib/validation/isValidFirebaseVehicleFormat';
+
+	let uid = '';
 	let vin: string = '';
 
 	let make: string = '';
@@ -40,10 +40,7 @@
 	let engineCC: string = '';
 	let engineCylinders: string = '';
 	let fuel: string = '';
-
 	let remarks: string = '';
-
-	let uid = '';
 	let phone = '';
 	let firstName = '';
 	let lastName = '';
@@ -72,7 +69,7 @@
 		uid = getFirebaseUserId();
 		if (!uid) goto(authLoginPage);
 
-		const vehicleFormat: FirebaseVehicleInfoFormat = {
+		const vehicleFormat: FirebaseVehicleFormat = {
 			uid,
 			vin,
 			make,
@@ -90,10 +87,12 @@
 			email,
 		};
 
-		// if (!isValidFirebaseVehicleInfoFormat(vehicleFormat)) return;
+		if (!isValidFirebaseVehicleFormat(vehicleFormat)) return;
 
 		storeNewFirebaseVehicleAsync(vehicleFormat)
-			.then(() => goto(homePage))
+			.then((newKey) => {
+				console.log(newKey);
+			})
 			.catch(() => null)
 			.finally(() => analyticsLogEntryEvent(uid));
 	};
@@ -116,7 +115,8 @@
 	onDestroy(() => unsubUserInformation());
 </script>
 
-<PageHeader label="Vehicles" subLabel="Register a new vehicle" />
+<PageHeader label="Vehicles" subLabel="Manage your vehicle fleet" />
+
 <SurfaceContainer>
 	<SurfaceHeader label="Vin Input" />
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-8 pb-2 mt-4 mx-4">
@@ -142,10 +142,18 @@
 		<MaterialInput bind:value={year} name="year" placeholder="Year" />
 		<MaterialInput bind:value={bodyClass} name="bodyClass" placeholder="Body Class" />
 
-		<MaterialInput bind:value={engineInfo} name="engineInfo" placeholder="Engine Information" />
-		<MaterialInput bind:value={engineCC} name="engineCC" placeholder="Displacement (CC)" />
-		<MaterialInput bind:value={engineCylinders} name="engineCylinders" placeholder="Cylinders" />
-		<MaterialInput bind:value={fuel} name="fuel" placeholder="Fuel Type" />
+		<MaterialInput bind:value={engineInfo} name="engineInfo" placeholder="Engine Information">
+			<IconCarCog />
+		</MaterialInput>
+		<MaterialInput bind:value={engineCC} name="engineCC" placeholder="Displacement (CC)">
+			<IconCarCog />
+		</MaterialInput>
+		<MaterialInput bind:value={engineCylinders} name="engineCylinders" placeholder="Cylinders">
+			<IconCarCog />
+		</MaterialInput>
+		<MaterialInput bind:value={fuel} name="fuel" placeholder="Fuel Type">
+			<IconCarCog />
+		</MaterialInput>
 
 		<div class="cols-span-1 md:col-span-2 lg:col-span-4">
 			<MaterialInput bind:value={remarks} name="remarks" placeholder="Remarks">

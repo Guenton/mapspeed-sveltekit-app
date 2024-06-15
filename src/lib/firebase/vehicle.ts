@@ -2,7 +2,7 @@ import { db } from './app';
 import { child, push, ref, remove, update } from 'firebase/database';
 
 import { alertTextState, alertTypeState } from '$lib/store';
-import type { FirebaseVehicleInfoFormat } from '$lib/types/vehicle';
+import type { FirebaseVehicleFormat } from '$lib/types/vehicle';
 
 export const getAllVehicleRef = () => child(ref(db), 'vehicles/');
 export const getAllUserVehicleRef = () => child(ref(db), 'user-vehicles/');
@@ -10,7 +10,7 @@ export const getVehicleRef = (key: string) => child(ref(db), `vehicles/${key}`);
 export const getUserVehicleRef = (uid: string) => child(ref(db), `user-vehicles/${uid}`);
 
 /** Stores the current authenticated user in firebase Reat-Time DB */
-export const storeNewFirebaseVehicleAsync = (vehicle: FirebaseVehicleInfoFormat) => {
+export const storeNewFirebaseVehicleAsync = (vehicle: FirebaseVehicleFormat) => {
 	const newVehicleKey = push(getAllVehicleRef()).key;
 
 	if (!newVehicleKey) {
@@ -19,7 +19,7 @@ export const storeNewFirebaseVehicleAsync = (vehicle: FirebaseVehicleInfoFormat)
 		throw new Error('Failed to create new Vehicle');
 	}
 
-	const updates: { [key: string]: FirebaseVehicleInfoFormat } = {};
+	const updates: { [key: string]: FirebaseVehicleFormat } = {};
 	updates[`vehicles/${newVehicleKey}`] = vehicle;
 	updates[`user-vehicles/${vehicle.uid}/${newVehicleKey}`] = vehicle;
 
@@ -27,6 +27,7 @@ export const storeNewFirebaseVehicleAsync = (vehicle: FirebaseVehicleInfoFormat)
 		.then(() => {
 			alertTypeState.set('success');
 			alertTextState.set('Vehicles/DB: ' + 'Vehicle Successfully Stored');
+			return newVehicleKey;
 		})
 		.catch((error) => {
 			alertTypeState.set('error');
@@ -35,7 +36,7 @@ export const storeNewFirebaseVehicleAsync = (vehicle: FirebaseVehicleInfoFormat)
 		});
 };
 
-export const updateFirebaseVehicleAsync = (key: string, vehicle: FirebaseVehicleInfoFormat) => {
+export const updateFirebaseVehicleAsync = (key: string, vehicle: FirebaseVehicleFormat) => {
 	if (!key) {
 		alertTypeState.set('error');
 		alertTextState.set(
@@ -44,7 +45,7 @@ export const updateFirebaseVehicleAsync = (key: string, vehicle: FirebaseVehicle
 		throw new Error('Failed to create new Vehicle could not find the vehicle key');
 	}
 
-	const updates: { [key: string]: FirebaseVehicleInfoFormat } = {};
+	const updates: { [key: string]: FirebaseVehicleFormat } = {};
 	updates[`vehicles/${key}`] = vehicle;
 	updates[`user-vehicles/${vehicle.uid}/${key}`] = vehicle;
 

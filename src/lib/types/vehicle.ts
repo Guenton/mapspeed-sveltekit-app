@@ -32,7 +32,7 @@ export type VehicleInfoNhtsa = {
 };
 
 /** VEHICLE - Firebase Vehicle Information Format */
-export type FirebaseVehicleInfoFormat = {
+export type FirebaseVehicleFormat = {
 	uid: string;
 	vin: string;
 	make: string;
