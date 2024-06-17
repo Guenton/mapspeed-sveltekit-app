@@ -16,18 +16,23 @@
 
 	import type { Unsubscriber } from 'svelte/store';
 	import type { FirebaseDatabaseUserFormat } from '$lib/types/auth';
-	import type { FirebaseVehicleFormat } from '$lib/types/vehicle';
+	import type { FirebaseVehicleFormat, VehicleTableRowFormat } from '$lib/types/vehicle';
 
 	import { goto } from '$app/navigation';
 	import { onValue } from 'firebase/database';
 	import { onDestroy, onMount } from 'svelte';
-	import { authLoginPage, homePage } from '$utils/pages';
+	import { authLoginPage, homePage, vehiclesPage } from '$utils/pages';
 	import { getFirebaseUserId, getUserRef } from '$lib/firebase/auth';
-	import { analyticsLogEntryEvent } from '$lib/firebase/analytics';
-	import { storeNewFirebaseVehicleAsync } from '$lib/firebase/vehicle';
+	import { analyticsVehicleEntryEvent } from '$lib/firebase/analytics';
+	import {
+		getAllUserVehicleRef,
+		getUserVehicleRef,
+		storeNewFirebaseVehicleAsync,
+	} from '$lib/firebase/vehicle';
 	import decodeVinWithNhtsa from '$lib/services/decodeVinWithNhtsa';
 	import isValidVinFormat from '$lib/validation/isValidVinFormat';
 	import isValidFirebaseVehicleFormat from '$lib/validation/isValidFirebaseVehicleFormat';
+	import { Table, tableMapperValues, type TableSource } from '@skeletonlabs/skeleton';
 
 	let uid = '';
 	let vin: string = '';
@@ -41,12 +46,26 @@
 	let engineCylinders: string = '';
 	let fuel: string = '';
 	let remarks: string = '';
-	let phone = '';
 	let firstName = '';
 	let lastName = '';
 	let email = '';
+	let phone = '';
 
 	let unsubUserInformation: Unsubscriber;
+	let unsubVehicles: Unsubscriber;
+
+	let vehicleTable: VehicleTableRowFormat[] = [];
+
+	const setVehicleTableSource = (): TableSource => ({
+		head: ['Vin', 'Make', 'Model', 'Year', 'Fuel', 'Remarks'],
+		body: tableMapperValues(vehicleTable, ['vin', 'make', 'model', 'year', 'fuel', 'remarks']),
+		meta: tableMapperValues(vehicleTable, ['key']),
+		foot: ['Totals', `<span class="badge variant-soft-primary">${vehicleTable.length}<span>`],
+	});
+
+	$: vehicleTableData = vehicleTable && setVehicleTableSource();
+
+	const onTableRowSelect = (event: CustomEvent) => goto(`${vehiclesPage}/${event.detail}`);
 
 	const vinLookup = () => {
 		if (!isValidVinFormat(vin)) return;
@@ -90,11 +109,9 @@
 		if (!isValidFirebaseVehicleFormat(vehicleFormat)) return;
 
 		storeNewFirebaseVehicleAsync(vehicleFormat)
-			.then((newKey) => {
-				console.log(newKey);
-			})
+			.then((newKey) => goto(`${vehiclesPage}/${newKey}`))
 			.catch(() => null)
-			.finally(() => analyticsLogEntryEvent(uid));
+			.finally(() => analyticsVehicleEntryEvent(uid));
 	};
 
 	onMount(() => {
@@ -110,12 +127,38 @@
 			email = data.email;
 			phone = data.phone;
 		});
+
+		unsubVehicles = onValue(getAllUserVehicleRef(uid), (snapshot) => {
+			if (!snapshot.exists()) return;
+
+			const list: VehicleTableRowFormat[] = [];
+
+			snapshot.forEach((childSnapshot) => {
+				const childKey = childSnapshot.key;
+				const childData = childSnapshot.val() as FirebaseVehicleFormat;
+				list.push({ key: childKey, ...childData });
+			});
+
+			vehicleTable = list;
+		});
 	});
 
-	onDestroy(() => unsubUserInformation());
+	onDestroy(() => {
+		unsubUserInformation();
+		unsubVehicles();
+	});
 </script>
 
 <PageHeader label="Vehicles" subLabel="Manage your vehicle fleet" />
+
+<SurfaceContainer>
+	<SurfaceHeader label="My Vehicles" />
+	<Table interactive source={vehicleTableData} on:selected={onTableRowSelect} />
+</SurfaceContainer>
+
+<br />
+
+<PageHeader subLabel="Add new vehicle to your fleet" />
 
 <SurfaceContainer>
 	<SurfaceHeader label="Vin Input" />
@@ -164,7 +207,7 @@
 
 	<br />
 
-	<SurfaceHeader label="User Meta Information" />
+	<SurfaceHeader label="Main Contact Information" />
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-8 pb-2 mt-4 mx-4">
 		<div class="cols-span-1 md:col-span-2">
 			<MaterialInput value={uid} name="uid" placeholder="User Id" disabled>

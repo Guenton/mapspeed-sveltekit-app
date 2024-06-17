@@ -43,9 +43,22 @@ export type FirebaseVehicleFormat = {
 	engineCC: string;
 	engineCylinders: string;
 	fuel: string;
-	email: string;
 	firstName: string;
 	lastName: string;
+	email: string;
 	phone: string;
+	remarks: string;
+};
+
+/** VEHICLE - Vehicle Table Row Format */
+export type VehicleTableRowFormat = {
+	key: string;
+	uid: string;
+	vin: string;
+	make: string;
+	model: string;
+	year: string;
+	engineCC: string;
+	fuel: string;
 	remarks: string;
 };

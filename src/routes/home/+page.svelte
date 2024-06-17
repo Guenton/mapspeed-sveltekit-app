@@ -1,167 +1,103 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
-	import { goto } from '$app/navigation';
-	import { authLoginPage, vehiclesPage, userPage } from '$utils/pages';
-	import {
-		fetchFirebaseUserInfo,
-		getFirebaseUserId,
-		setFirebaseUserToState,
-	} from '$lib/firebase/auth';
 	import PageHeader from '$lib/components/content/PageHeader.svelte';
 	import SurfaceContainer from '$lib/components/containers/SurfaceContainer.svelte';
 	import SurfaceHeader from '$lib/components/content/SurfaceHeader.svelte';
-	import { onValue } from 'firebase/database';
-	import { getAllUserWorkoutLogRef, getAllWorkoutLogRef, getUserLogRef } from '$lib/firebase/log';
+
 	import type { Unsubscriber } from 'svelte/store';
-	import type { FirebaseWorkoutLogFormat, StandingsTableRowFormat } from '$lib/types/log';
+	import type { FirebaseServiceFormat, ServiceTableRowFormat } from '$lib/types/service';
+	import type { FirebaseVehicleFormat, VehicleTableRowFormat } from '$lib/types/vehicle';
+	import { goto } from '$app/navigation';
+	import { onDestroy, onMount } from 'svelte';
+	import { onValue } from 'firebase/database';
+	import { getFirebaseUserId } from '$lib/firebase/auth';
+	import { authLoginPage, vehiclesPage, servicePage } from '$utils/pages';
 	import { Table, tableMapperValues, type TableSource } from '@skeletonlabs/skeleton';
+	import { getAllUserVehicleRef } from '$lib/firebase/vehicle';
+	import { getAllUserServiceRef } from '$lib/firebase/service';
 
-	let myTtlEntries: number = 0;
-	let myTtlDuration: number = 0;
-	let myTtlReps: number = 0;
+	let uid = '';
 
-	let groupTtlEntries: number = 0;
-	let groupTtlDuration: number = 0;
-	let groupTtlReps: number = 0;
+	let serviceTable: ServiceTableRowFormat[] = [];
+	let vehicleTable: VehicleTableRowFormat[] = [];
 
-	let grandTotalTable: StandingsTableRowFormat[] = [];
+	let unsubServices: Unsubscriber;
+	let unsubVehicles: Unsubscriber;
 
-	let unsubMyLogs: Unsubscriber;
-	let unsubAllUserLogs: Unsubscriber;
-
-	const setGrandTotalTableSource = (): TableSource => ({
-		head: ['First Name', 'Last Name', 'Log Entries', 'Total Workout Minutes', 'Total Workout Reps'],
-		body: tableMapperValues(grandTotalTable, [
-			'firstName',
-			'lastName',
-			'ttlEntries',
-			'ttlDuration',
-			'ttlReps',
+	const setServiceTableSource = (): TableSource => ({
+		head: ['Vehicle Info', 'Vehicle VIN', 'Service Date', 'Remarks', 'STATUS'],
+		body: tableMapperValues(serviceTable, [
+			'vehicleInfo',
+			'vin',
+			'displayDate',
+			'remarks',
+			'status',
 		]),
-		meta: tableMapperValues(grandTotalTable, ['key']),
-		foot: [
-			'Totals',
-			`<span class="badge variant-soft-primary">${grandTotalTable.length}<span>`,
-			`<span class="badge variant-soft-primary">${groupTtlEntries}<span>`,
-			`<span class="badge variant-soft-primary">${groupTtlDuration}<span>`,
-			`<span class="badge variant-soft-primary">${groupTtlReps}<span>`,
-		],
+		meta: tableMapperValues(serviceTable, ['key']),
+		foot: ['Totals', `<span class="badge variant-soft-primary">${serviceTable.length}<span>`],
 	});
 
-	$: grandTotalTableData = grandTotalTable && setGrandTotalTableSource();
+	$: serviceTableData = serviceTable && setServiceTableSource();
 
-	const onTableRowSelect = (event: CustomEvent) => console.log(event.detail);
+	const setVehicleTableSource = (): TableSource => ({
+		head: ['Vin', 'Make', 'Model', 'Year', 'Fuel', 'Remarks'],
+		body: tableMapperValues(vehicleTable, ['vin', 'make', 'model', 'year', 'fuel', 'remarks']),
+		meta: tableMapperValues(vehicleTable, ['key']),
+		foot: ['Totals', `<span class="badge variant-soft-primary">${vehicleTable.length}<span>`],
+	});
+
+	$: vehicleTableData = vehicleTable && setVehicleTableSource();
+
+	const onServiceTableRowSelect = (event: CustomEvent) => goto(`${servicePage}/${event.detail}`);
+	const onVehicleTableRowSelect = (event: CustomEvent) => goto(`${vehiclesPage}/${event.detail}`);
 
 	onMount(() => {
-		const userId = getFirebaseUserId();
-		if (!userId) return goto(authLoginPage);
+		uid = getFirebaseUserId();
+		if (!uid) goto(authLoginPage);
 
-		fetchFirebaseUserInfo()
-			.then((firebaseUser) => {
-				if (!firebaseUser) return goto(userPage);
-				setFirebaseUserToState(firebaseUser);
-			})
-			.catch(() => null);
-
-		unsubMyLogs = onValue(getUserLogRef(userId), (snapshot) => {
+		unsubServices = onValue(getAllUserServiceRef(uid), (snapshot) => {
 			if (!snapshot.exists()) return;
 
+			const list: ServiceTableRowFormat[] = [];
+
 			snapshot.forEach((childSnapshot) => {
-				const childData = childSnapshot.val() as FirebaseWorkoutLogFormat;
-				myTtlDuration = myTtlDuration + childData.duration;
-				myTtlReps = myTtlReps + childData.reps;
-				myTtlEntries = snapshot.size;
+				const childKey = childSnapshot.key;
+				const childData = childSnapshot.val() as FirebaseServiceFormat;
+				list.push({ key: childKey, ...childData });
 			});
+
+			serviceTable = list;
 		});
 
-		unsubAllUserLogs = onValue(getAllUserWorkoutLogRef(), (snapshot) => {
+		unsubVehicles = onValue(getAllUserVehicleRef(uid), (snapshot) => {
 			if (!snapshot.exists()) return;
 
-			const list: StandingsTableRowFormat[] = [];
+			const list: VehicleTableRowFormat[] = [];
 
 			snapshot.forEach((childSnapshot) => {
-				const row: StandingsTableRowFormat = {
-					uid: '',
-					email: '',
-					firstName: '',
-					lastName: '',
-					ttlEntries: 0,
-					ttlDuration: 0,
-					ttlReps: 0,
-				};
-
-				childSnapshot.forEach((grandChildSnapshot) => {
-					const grandChildKey = grandChildSnapshot.key;
-					const grandChildData = grandChildSnapshot.val() as FirebaseWorkoutLogFormat;
-
-					row.uid = grandChildKey;
-					row.email = grandChildData.email;
-					row.firstName = grandChildData.firstName;
-					row.lastName = grandChildData.lastName;
-					row.ttlEntries = childSnapshot.size;
-					row.ttlDuration = row.ttlDuration + grandChildData.duration;
-					row.ttlReps = row.ttlReps + grandChildData.reps;
-
-					groupTtlDuration = groupTtlDuration + grandChildData.duration;
-					groupTtlReps = groupTtlReps + grandChildData.reps;
-				});
-
-				groupTtlEntries = groupTtlEntries + row.ttlEntries;
-				list.push(row);
+				const childKey = childSnapshot.key;
+				const childData = childSnapshot.val() as FirebaseVehicleFormat;
+				list.push({ key: childKey, ...childData });
 			});
 
-			list.sort((a, b) => b.ttlReps - a.ttlReps);
-
-			grandTotalTable = list;
+			vehicleTable = list;
 		});
 	});
 
 	onDestroy(() => {
-		if (unsubMyLogs) unsubMyLogs();
-		if (unsubAllUserLogs) unsubAllUserLogs();
+		if (unsubServices) unsubServices();
+		if (unsubVehicles) unsubVehicles();
 	});
 </script>
 
 <PageHeader label="Dashboard" subLabel="View General Information" />
 <SurfaceContainer>
-	<SurfaceHeader label="Totals" />
-	<Table interactive source={grandTotalTableData} on:selected={onTableRowSelect} />
+	<SurfaceHeader label="Service Appointments" />
+	<Table interactive source={serviceTableData} on:selected={onServiceTableRowSelect} />
 </SurfaceContainer>
 
-<div class="flex flex-col md:flex-row gap-5 pb-2 mt-4">
-	<div class="flex-1">
-		<SurfaceContainer>
-			<SurfaceHeader label=" Group Totals" />
-			<div class="flex justify-between m-4">
-				<h3 class="h3">Log Entries:</h3>
-				<h3 class="h3 text-primary-500">{groupTtlEntries}</h3>
-			</div>
-			<div class="flex justify-between m-4">
-				<h3 class="h3">Workout Minutes:</h3>
-				<h3 class="h3 text-primary-500">{groupTtlDuration}</h3>
-			</div>
-			<div class="flex justify-between m-4">
-				<h3 class="h3">Workout Reps:</h3>
-				<h3 class="h3 text-primary-500">{groupTtlReps}</h3>
-			</div>
-		</SurfaceContainer>
-	</div>
+<br />
 
-	<div class="flex-1">
-		<SurfaceContainer>
-			<SurfaceHeader label="My Totals" />
-			<div class="flex justify-between m-4">
-				<h3 class="h3">Log Entries:</h3>
-				<h3 class="h3 text-primary-500">{myTtlEntries}</h3>
-			</div>
-			<div class="flex justify-between m-4">
-				<h3 class="h3">Workout Minutes:</h3>
-				<h3 class="h3 text-primary-500">{myTtlDuration}</h3>
-			</div>
-			<div class="flex justify-between m-4">
-				<h3 class="h3">Workout Reps:</h3>
-				<h3 class="h3 text-primary-500">{myTtlReps}</h3>
-			</div>
-		</SurfaceContainer>
-	</div>
-</div>
+<SurfaceContainer>
+	<SurfaceHeader label="My Vehicles" />
+	<Table interactive source={vehicleTableData} on:selected={onVehicleTableRowSelect} />
+</SurfaceContainer>

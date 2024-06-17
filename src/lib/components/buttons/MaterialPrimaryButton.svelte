@@ -9,11 +9,7 @@
 	const click = () => dispatch('click');
 </script>
 
-<button
-	class="btn px-6 bg-gradient-to-t variant-gradient-tertiary-primary w-full max-w-md"
-	{disabled}
-	on:click={click}
->
+<button class="btn px-6 variant-filled-primary w-full max-w-md" {disabled} on:click={click}>
 	<span>{label}</span>
 	<slot><IconSend /></slot>
 </button>

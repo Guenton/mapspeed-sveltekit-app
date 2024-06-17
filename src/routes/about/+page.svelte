@@ -32,7 +32,7 @@
 <SurfaceContainer>
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-8 pb-2 mt-4 mx-4">
 		<SurfaceHeader label="Current App Version" />
-		<MaterialInput name="version" value="1.1.2">
+		<MaterialInput name="version" value="1.0.0">
 			<IconAppBrackets />
 		</MaterialInput>
 
@@ -40,19 +40,7 @@
 		<ul class="list">
 			<li>
 				<span><IconRfcCheck /></span>
-				<span class="flex-auto">Added about section</span>
-			</li>
-			<li>
-				<span><IconRfcCheck /></span>
-				<span class="flex-auto">Made All Logos Clickable</span>
-			</li>
-			<li>
-				<span><IconRfcCheck /></span>
-				<span class="flex-auto">Added Remarks Column to Stats Table</span>
-			</li>
-			<li>
-				<span><IconBugCheck /></span>
-				<span class="flex-auto">Removed Log ID from Stats Table</span>
+				<span class="flex-auto">Created first Alpha Release</span>
 			</li>
 		</ul>
 
@@ -68,7 +56,7 @@
 		<a href="mailto:guenton@gmail.com" class="mt-2"><LogoGuenton /></a>
 
 		<SurfaceHeader label="App Source Code" />
-		<a href="https://github.com/GuentonBrooks/logfit-sveltekit-app" target="_blank" class="anchor"
+		<a href="https://github.com/Guenton/mapspeed-sveltekit-app" target="_blank" class="anchor"
 			>View Source code on GitHub</a
 		>
 	</div>

@@ -81,22 +81,44 @@ export const analyticsDeleteUserEvent = (uid: string) => {
 	analyticsState.update((events) => [...events, newEvent]);
 };
 
-export const analyticsLogEntryEvent = (uid: string) => {
+export const analyticsVehicleEntryEvent = (uid: string) => {
 	const newEvent: GoogleAnalyticsEvent = {
-		id: 'log-entry',
+		id: 'vehicle-entry',
 		data: { uid },
-		event: 'log_entry',
+		event: 'vehicle_entry',
 		type: 'event',
 	};
 
 	analyticsState.update((events) => [...events, newEvent]);
 };
 
-export const analyticsLogEditEvent = (uid: string) => {
+export const analyticsVehicleEditEvent = (uid: string) => {
 	const newEvent: GoogleAnalyticsEvent = {
-		id: 'log-edit',
+		id: 'vehicle-edit',
 		data: { uid },
-		event: 'log_entry',
+		event: 'vehicle_entry',
+		type: 'event',
+	};
+
+	analyticsState.update((events) => [...events, newEvent]);
+};
+
+export const analyticsServiceEntryEvent = (uid: string) => {
+	const newEvent: GoogleAnalyticsEvent = {
+		id: 'service-entry',
+		data: { uid },
+		event: 'service_entry',
+		type: 'event',
+	};
+
+	analyticsState.update((events) => [...events, newEvent]);
+};
+
+export const analyticsServiceEditEvent = (uid: string) => {
+	const newEvent: GoogleAnalyticsEvent = {
+		id: 'service-edit',
+		data: { uid },
+		event: 'service_entry',
 		type: 'event',
 	};
 

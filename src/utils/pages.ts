@@ -12,8 +12,8 @@ export const homePage = '/home';
 // VEHICLES
 export const vehiclesPage = '/vehicles';
 
-// STATS
-export const statsPage = '/stats';
+// SERVICE
+export const servicePage = '/service';
 
 // USER
 export const userPage = '/user';

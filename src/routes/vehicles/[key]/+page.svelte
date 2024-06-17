@@ -1,133 +1,199 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { authLoginPage, homePage, statsPage } from '$utils/pages';
-	import { getFirebaseUserId, getUserRef } from '$lib/firebase/auth';
+	import { authLoginPage, homePage, vehiclesPage } from '$utils/pages';
+	import { getFirebaseUserId } from '$lib/firebase/auth';
 
 	import IconComment from '~icons/mdi/comment-processing';
 	import IconAccount from '~icons/mdi/account';
 	import IconAt from '~icons/mdi/at';
+	import IconPhone from '~icons/mdi/phone';
 	import IconId from '~icons/mdi/identifier';
+	import IconCarCog from '~icons/mdi/car-cog';
+	import IconABC from '~icons/mdi/alphabetical-variant';
 	import PageHeader from '$lib/components/content/PageHeader.svelte';
 	import SurfaceContainer from '$lib/components/containers/SurfaceContainer.svelte';
 	import SurfaceHeader from '$lib/components/content/SurfaceHeader.svelte';
-	import DateInput from '$lib/components/inputs/DateInput.svelte';
-	import TimeInput from '$lib/components/inputs/TimeInput.svelte';
-	import RepsInput from '$lib/components/inputs/RepsInput.svelte';
-	import SubmitButton from '$lib/components/buttons/SubmitButton.svelte';
 	import MaterialInput from '$lib/components/inputs/MaterialInput.svelte';
-	import type { Unsubscriber } from 'svelte/store';
-	import { onValue } from 'firebase/database';
-	import type { FirebaseWorkoutLogFormat } from '$lib/types/log';
-	import isValidFirebaseWorkoutLogFormat from '$lib/validation/isValidFirebaseWorkoutLogFormat';
-	import {
-		getWorkoutLogRef,
-		removeFirebaseWorkoutLogAsync,
-		updateFirebaseWorkoutLogAsync,
-	} from '$lib/firebase/log';
-	import { page } from '$app/stores';
-	import DeleteButton from '$lib/components/buttons/DeleteButton.svelte';
-	import { analyticsLogEditEvent } from '$lib/firebase/analytics';
 	import MaterialSecondaryButton from '$lib/components/buttons/MaterialSecondaryButton.svelte';
 	import MaterialTertiaryButton from '$lib/components/buttons/MaterialTertiaryButton.svelte';
 
+	import type { Unsubscriber } from 'svelte/store';
+	import type { FirebaseVehicleFormat } from '$lib/types/vehicle';
+	import isValidFirebaseVehicleFormat from '$lib/validation/isValidFirebaseVehicleFormat';
+	import { analyticsVehicleEditEvent } from '$lib/firebase/analytics';
+	import { onValue } from 'firebase/database';
+	import { page } from '$app/stores';
+	import {
+		getUserVehicleRef,
+		removeFirebaseVehicleAsync,
+		updateFirebaseVehicleAsync,
+	} from '$lib/firebase/vehicle';
+
 	const key = $page.params.key;
 
-	let date: string = '';
-	let duration: number;
-	let reps: number;
-	let remarks: string = '';
-
 	let uid = '';
+	let vin: string = '';
+
+	let make: string = '';
+	let model: string = '';
+	let year: string = '';
+	let bodyClass: string = '';
+	let engineInfo: string = '';
+	let engineCC: string = '';
+	let engineCylinders: string = '';
+	let fuel: string = '';
+	let remarks: string = '';
+	let phone = '';
 	let firstName = '';
 	let lastName = '';
 	let email = '';
 
-	let unsubUserInformation: Unsubscriber;
+	let unsubVehicle: Unsubscriber;
 
 	const store = () => {
-		const userId = getFirebaseUserId();
-		if (!userId) goto(authLoginPage);
+		if (!uid) goto(authLoginPage);
 
-		const logFormat: FirebaseWorkoutLogFormat = {
+		const vehicleFormat: FirebaseVehicleFormat = {
 			uid,
+			vin,
+			make,
+			model,
+			year,
+			bodyClass,
+			engineInfo,
+			engineCC,
+			engineCylinders,
+			fuel,
+			remarks,
 			firstName,
 			lastName,
+			phone,
 			email,
-			date,
-			duration,
-			reps,
-			remarks,
 		};
-		if (!isValidFirebaseWorkoutLogFormat(logFormat)) return;
 
-		updateFirebaseWorkoutLogAsync(key, logFormat)
-			.then(() => goto(homePage))
+		if (!isValidFirebaseVehicleFormat(vehicleFormat)) return;
+
+		updateFirebaseVehicleAsync(key, vehicleFormat)
+			.then(() => goto(vehiclesPage))
 			.catch(() => null)
-			.finally(() => analyticsLogEditEvent(getFirebaseUserId()));
+			.finally(() => analyticsVehicleEditEvent(getFirebaseUserId()));
 	};
 
 	const remove = () => {
-		removeFirebaseWorkoutLogAsync(key, uid)
+		removeFirebaseVehicleAsync(key, uid)
 			.then(() => goto(homePage))
 			.catch(() => {})
-			.finally(() => analyticsLogEditEvent(getFirebaseUserId()));
+			.finally(() => analyticsVehicleEditEvent(getFirebaseUserId()));
 	};
 
 	onMount(() => {
+		const userId = getFirebaseUserId();
+		if (!userId) goto(authLoginPage);
+
 		if (!key) console.log('Invalid key');
 
-		unsubUserInformation = onValue(getWorkoutLogRef(key), (snapshot) => {
+		unsubVehicle = onValue(getUserVehicleRef(userId, key), (snapshot) => {
 			if (!snapshot.exists()) return;
 
-			const data = snapshot.val() as FirebaseWorkoutLogFormat;
+			const data = snapshot.val() as FirebaseVehicleFormat;
+
 			uid = data.uid;
 			firstName = data.firstName;
 			lastName = data.lastName;
 			email = data.email;
-			date = data.date;
-			duration = data.duration;
-			reps = data.reps;
+			vin = data.vin;
+			make = data.make;
+			model = data.model;
+			year = data.year;
+			bodyClass = data.bodyClass;
+			engineInfo = data.engineInfo;
+			engineCC = data.engineCC;
+			engineCylinders = data.engineCylinders;
+			fuel = data.fuel;
+			remarks = data.remarks;
+			phone = data.phone;
 			remarks = data.remarks;
 		});
 	});
 
-	onDestroy(() => unsubUserInformation());
+	onDestroy(() => unsubVehicle());
 </script>
 
-<PageHeader label="Logs" subLabel="Edit Workout with Log Id: {key}" />
+<PageHeader label="Vehicle" subLabel="Edit {make} {model} {year || 'Vehicle'}, with VIN# {vin}" />
 <SurfaceContainer>
-	<SurfaceHeader label="Entry Information" />
-	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 m-4">
-		<DateInput bind:value={date} />
-		<TimeInput bind:value={duration} />
-		<RepsInput bind:value={reps} />
-		<MaterialInput bind:value={remarks} name="remarks" placeholder="Remarks">
-			<IconComment />
-		</MaterialInput>
+	<SurfaceHeader label="Vin Number" />
+	<div class="grid grid-cols-1 md:grid-cols-2 gap-8 pb-2 mt-4 mx-4">
+		<div class="cols-span-1 md:col-span-2">
+			<MaterialInput
+				name="vin"
+				placeholder="Vehicle Identification Number (VIN)"
+				value={vin}
+				disabled
+			>
+				<IconABC />
+			</MaterialInput>
+		</div>
 	</div>
 
 	<br />
 
-	<SurfaceHeader label="Additional Meta Information" />
-	<div class="grid grid-cols-1 md:grid-cols-2 gap-8 pb-2 mt-4 mx-4">
-		<MaterialInput value={uid} name="uid" placeholder="User Id" disabled>
-			<IconId />
+	<SurfaceHeader label="Vehicle Information" />
+	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 m-4">
+		<MaterialInput bind:value={make} name="make" placeholder="Make" />
+		<MaterialInput bind:value={model} name="model" placeholder="Model" />
+		<MaterialInput bind:value={year} name="year" placeholder="Year" />
+		<MaterialInput bind:value={bodyClass} name="bodyClass" placeholder="Body Class" />
+
+		<MaterialInput bind:value={engineInfo} name="engineInfo" placeholder="Engine Information">
+			<IconCarCog />
 		</MaterialInput>
+		<MaterialInput bind:value={engineCC} name="engineCC" placeholder="Displacement (CC)">
+			<IconCarCog />
+		</MaterialInput>
+		<MaterialInput bind:value={engineCylinders} name="engineCylinders" placeholder="Cylinders">
+			<IconCarCog />
+		</MaterialInput>
+		<MaterialInput bind:value={fuel} name="fuel" placeholder="Fuel Type">
+			<IconCarCog />
+		</MaterialInput>
+
+		<div class="cols-span-1 md:col-span-2 lg:col-span-4">
+			<MaterialInput bind:value={remarks} name="remarks" placeholder="Remarks">
+				<IconComment />
+			</MaterialInput>
+		</div>
+	</div>
+
+	<br />
+
+	<SurfaceHeader label="Main Contact Information" />
+	<div class="grid grid-cols-1 md:grid-cols-2 gap-8 pb-2 mt-4 mx-4">
+		<div class="cols-span-1 md:col-span-2">
+			<MaterialInput value={uid} name="uid" placeholder="User Id" disabled>
+				<IconId />
+			</MaterialInput>
+		</div>
 
 		<MaterialInput value={firstName} name="firstName" placeholder="First Name" disabled>
 			<IconAccount />
 		</MaterialInput>
 
-		<MaterialInput value={lastName} name="lastName" placeholder="Last Name" disabled />
+		<MaterialInput value={lastName} name="lastName" placeholder="Last Name" disabled>
+			<IconAccount />
+		</MaterialInput>
 
 		<MaterialInput value={email} name="email" placeholder="Email" disabled>
 			<IconAt />
 		</MaterialInput>
+
+		<MaterialInput value={phone} name="phone" placeholder="Phone" disabled>
+			<IconPhone />
+		</MaterialInput>
 	</div>
 
 	<div class="flex items-center justify-center gap-8 my-5 mx-4 mt-8">
-		<MaterialSecondaryButton on:click={store} />
-		<MaterialTertiaryButton on:click={remove} />
+		<MaterialSecondaryButton label="Save Changes" on:click={store} />
+		<MaterialTertiaryButton label="Delete Vehicle" on:click={remove} />
 	</div>
 </SurfaceContainer>

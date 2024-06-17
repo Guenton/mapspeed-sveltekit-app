@@ -5,9 +5,10 @@ import { alertTextState, alertTypeState } from '$lib/store';
 import type { FirebaseVehicleFormat } from '$lib/types/vehicle';
 
 export const getAllVehicleRef = () => child(ref(db), 'vehicles/');
-export const getAllUserVehicleRef = () => child(ref(db), 'user-vehicles/');
 export const getVehicleRef = (key: string) => child(ref(db), `vehicles/${key}`);
-export const getUserVehicleRef = (uid: string) => child(ref(db), `user-vehicles/${uid}`);
+export const getAllUserVehicleRef = (uid: string) => child(ref(db), `user-vehicles/${uid}`);
+export const getUserVehicleRef = (uid: string, key: string) =>
+	child(ref(db), `user-vehicles/${uid}/${key}`);
 
 /** Stores the current authenticated user in firebase Reat-Time DB */
 export const storeNewFirebaseVehicleAsync = (vehicle: FirebaseVehicleFormat) => {

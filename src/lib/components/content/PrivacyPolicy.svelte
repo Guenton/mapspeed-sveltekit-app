@@ -34,8 +34,7 @@
 	</li>
 	<li>
 		<p>
-			<strong>Application</strong> refers to Logfit Crossfit App, the software program provided by the
-			Company.
+			<strong>Application</strong> refers to MapSpeed App, the software program provided by the Company.
 		</p>
 	</li>
 	<li>
@@ -85,11 +84,9 @@
 	</li>
 	<li>
 		<p>
-			<strong>Website</strong> refers to Logfit Crossfit App, accessible from
-			<a
-				href="https://logfitwillemstad.netlify.app/"
-				rel="external nofollow noopener"
-				target="_blank">https://logfitwillemstad.netlify.app/</a
+			<strong>Website</strong> refers to MapSpeed accessible from
+			<a href="https://mapspeed.netlify.app/" rel="external nofollow noopener" target="_blank"
+				>https://mapspeed.netlify.app/</a
 			>
 		</p>
 	</li>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { TabAnchor, TabGroup } from '@skeletonlabs/skeleton';
-	import { homePage, vehiclesPage, statsPage } from '$utils/pages';
+	import { homePage, vehiclesPage, servicePage } from '$utils/pages';
 </script>
 
 <TabGroup
@@ -21,7 +21,7 @@
 		<span>Vehicles</span>
 	</TabAnchor>
 
-	<TabAnchor href={statsPage} selected={$page.url.pathname.startsWith(statsPage)}>
-		<span>History</span>
+	<TabAnchor href={servicePage} selected={$page.url.pathname.startsWith(servicePage)}>
+		<span>Service</span>
 	</TabAnchor>
 </TabGroup>
