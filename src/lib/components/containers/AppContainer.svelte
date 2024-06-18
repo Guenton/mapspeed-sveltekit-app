@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { AppShell } from '@skeletonlabs/skeleton';
 
 	import AppBar from '../content/AppBar.svelte';
