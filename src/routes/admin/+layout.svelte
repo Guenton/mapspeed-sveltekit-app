@@ -7,8 +7,6 @@
 	import { isDarkModeState } from '$lib/store';
 	import { isAdminState } from '$lib/store/auth';
 	import { getFirebaseUserId, getUserRef } from '$lib/firebase/auth';
-	import { goto } from '$app/navigation';
-	import { homePage } from '$utils/pages';
 
 	let unsubDarkMode: Unsubscriber;
 	let unsubUser: Unsubscriber;
@@ -32,8 +30,6 @@
 
 			const isAdmin = snapshot.val().isAdmin;
 			isAdminState.set(isAdmin);
-
-			if (!isAdmin) goto(homePage);
 		});
 	});
 

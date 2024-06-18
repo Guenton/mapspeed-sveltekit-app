@@ -17,6 +17,9 @@ export const servicePage = '/service';
 
 // ADMIN
 export const adminPage = '/admin';
+export const adminUsersPage = '/admin/users';
+export const adminVehiclesPage = '/admin/vehicles';
+export const adminAppointmentsPage = '/admin/appointments';
 
 // USER
 export const userPage = '/user';
