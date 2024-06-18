@@ -53,6 +53,7 @@
 	onMount(() => {
 		uid = getFirebaseUserId();
 		if (!uid) goto(authLoginPage);
+		else document.cookie = `userId=${uid}; path=/;`;
 
 		unsubServices = onValue(getAllUserServiceRef(uid), (snapshot) => {
 			if (!snapshot.exists()) return;

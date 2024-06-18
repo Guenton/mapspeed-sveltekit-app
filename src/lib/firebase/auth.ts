@@ -21,6 +21,9 @@ export const auth = getAuth(app);
 /** Google Auth Provider */
 const provider = new GoogleAuthProvider();
 
+/** Get a Reference to the user db by the given uid */
+export const getUserRef = (uid: string) => child(ref(db), `users/${uid}`);
+
 /** Sign in with Google redirect */
 export const googleSignInRedirect = () =>
 	signInWithRedirect(auth, provider).catch((error) => {
@@ -45,6 +48,7 @@ export const firebaseSignOut = () =>
 			emailState.set('');
 			firstNameState.set('');
 			lastNameState.set('');
+			document.cookie = 'userId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 		})
 		.catch((error) => {
 			alertTypeState.set('error');
@@ -106,6 +110,9 @@ export const getFirebaseUserEmail = () => auth.currentUser?.email || '';
 /** Get Current User's Display Name */
 export const getFirebaseDisplayName = () => auth.currentUser?.displayName || '';
 
+/** Get Current User's long Info */
+export const getFirebaseUserLongInfo = () => auth.currentUser;
+
 /** Get Current User's short Info */
 export const getFirebaseUserShortInfo = (): FirebaseUserShortInfoFormat => {
 	const shortInfo = {} as FirebaseUserShortInfoFormat;
@@ -119,9 +126,6 @@ export const getFirebaseUserShortInfo = (): FirebaseUserShortInfoFormat => {
 	shortInfo.lastName = splitResult[0].split('.')[1];
 	return shortInfo;
 };
-
-/** Get Current User's long Info */
-export const getFirebaseUserLongInfo = () => auth.currentUser;
 
 /** Stores the current authenticated user in firebase Reat-Time DB */
 export const storeFirebaseUserAsync = (user: FirebaseDatabaseUserFormat) =>
@@ -186,9 +190,6 @@ export const setFirebaseAdminState = (user: FirebaseDatabaseUserFormat) => {
 	firstNameState.set(user.firstName);
 	lastNameState.set(user.lastName);
 };
-
-/** Get a Reference to the user db by the given uid */
-export const getUserRef = (uid: string) => child(ref(db), `users/${uid}`);
 
 /** Stores feedback in the firebase Reat-Time DB */
 export const storeFirebaseFeedbackAsync = (uid: string, feedback: string) =>

@@ -12,7 +12,11 @@
 	import isValidLoginFormat from '$lib/validation/isValidLoginFormat';
 	import { authForgotPage, authSignupPage, homePage, policyPage } from '$utils/pages';
 	import { analyticEmailAndPasswordSignIn, analyticGoogleSignIn } from '$lib/firebase/analytics';
-	import { firebasePasswordSignIn, googleSignInRedirect } from '$lib/firebase/auth';
+	import {
+		firebasePasswordSignIn,
+		getFirebaseUserId,
+		googleSignInRedirect,
+	} from '$lib/firebase/auth';
 	import MaterialPrimaryButton from '$lib/components/buttons/MaterialPrimaryButton.svelte';
 
 	let email: string = '';
@@ -33,7 +37,11 @@
 		if (!isValidLoginFormat(loginFormat)) return;
 
 		firebasePasswordSignIn(email, password)
-			.then(() => goto(homePage))
+			.then(() => {
+				const userId = getFirebaseUserId();
+				document.cookie = `userId=${userId}; path=/;`;
+				goto(homePage);
+			})
 			.catch(() => null)
 			.finally(() => analyticEmailAndPasswordSignIn());
 	};

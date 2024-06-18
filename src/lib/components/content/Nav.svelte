@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { TabAnchor, TabGroup } from '@skeletonlabs/skeleton';
-	import { homePage, vehiclesPage, servicePage } from '$utils/pages';
+	import { homePage, vehiclesPage, servicePage, adminPage } from '$utils/pages';
+	import { isAdminState } from '$lib/store/auth';
 </script>
 
 <TabGroup
@@ -24,4 +25,10 @@
 	<TabAnchor href={servicePage} selected={$page.url.pathname.startsWith(servicePage)}>
 		<span>Service</span>
 	</TabAnchor>
+
+	{#if $isAdminState}
+		<TabAnchor href={adminPage} selected={$page.url.pathname.startsWith(adminPage)}>
+			<span>Admin</span>
+		</TabAnchor>
+	{/if}
 </TabGroup>

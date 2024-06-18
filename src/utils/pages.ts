@@ -15,6 +15,9 @@ export const vehiclesPage = '/vehicles';
 // SERVICE
 export const servicePage = '/service';
 
+// ADMIN
+export const adminPage = '/admin';
+
 // USER
 export const userPage = '/user';
 
