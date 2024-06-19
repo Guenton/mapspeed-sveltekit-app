@@ -89,3 +89,27 @@ export const removeFirebaseServiceAsync = (key: string, uid: string) => {
 			throw error;
 		});
 };
+
+/** Stores Mechanic Advice for the specified service appointment */
+export const storeFirebaseServiceAdviceAsync = (key: string, uid: string, advice: string) => {
+	if (!key) {
+		alertTypeState.set('error');
+		alertTextState.set('Service/DB: ' + 'Failed to store mechanic advice, missing appointment Key');
+		throw new Error('Failed to store mechanic advice, missing service Key');
+	}
+
+	const updates: { [key: string]: string } = {};
+	updates[`service/${key}/advice`] = advice;
+	updates[`user-service/${uid}/${key}/advice`] = advice;
+
+	return update(ref(db), updates)
+		.then(() => {
+			alertTypeState.set('success');
+			alertTextState.set('Service/DB: ' + 'Mechanic Advice Successfully Stored');
+		})
+		.catch((error) => {
+			alertTypeState.set('error');
+			alertTextState.set('Service/DB: ' + error.message);
+			throw error;
+		});
+};

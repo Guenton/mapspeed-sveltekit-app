@@ -12,12 +12,12 @@
 	import IconId from '~icons/mdi/identifier';
 	import IconCarCog from '~icons/mdi/car-cog';
 	import IconABC from '~icons/mdi/alphabetical-variant';
+	import IconUpload from '~icons/mdi/upload';
 	import PageHeader from '$lib/components/content/PageHeader.svelte';
 	import SurfaceContainer from '$lib/components/containers/SurfaceContainer.svelte';
 	import SurfaceHeader from '$lib/components/content/SurfaceHeader.svelte';
 	import MaterialInput from '$lib/components/inputs/MaterialInput.svelte';
-	import MaterialSecondaryButton from '$lib/components/buttons/MaterialSecondaryButton.svelte';
-	import MaterialTertiaryButton from '$lib/components/buttons/MaterialTertiaryButton.svelte';
+	import MaterialPrimaryFab from '$lib/components/buttons/MaterialPrimaryFab.svelte';
 
 	import type { Unsubscriber } from 'svelte/store';
 	import type { FirebaseVehicleFormat } from '$lib/types/vehicle';
@@ -28,6 +28,7 @@
 	import {
 		getUserVehicleRef,
 		removeFirebaseVehicleAsync,
+		storeFirebaseVehicleAdviceAsync,
 		updateFirebaseVehicleAsync,
 	} from '$lib/firebase/vehicle';
 
@@ -53,42 +54,7 @@
 
 	let unsubVehicle: Unsubscriber;
 
-	const store = () => {
-		if (!uid) goto(authLoginPage);
-
-		const vehicleFormat: FirebaseVehicleFormat = {
-			uid,
-			vin,
-			make,
-			model,
-			year,
-			bodyClass,
-			engineInfo,
-			engineCC,
-			engineCylinders,
-			fuel,
-			remarks,
-			advice,
-			firstName,
-			lastName,
-			phone,
-			email,
-		};
-
-		if (!isValidFirebaseVehicleFormat(vehicleFormat)) return;
-
-		updateFirebaseVehicleAsync(key, vehicleFormat)
-			.then(() => goto(vehiclesPage))
-			.catch(() => null)
-			.finally(() => analyticsVehicleEditEvent(getFirebaseUserId()));
-	};
-
-	const remove = () => {
-		removeFirebaseVehicleAsync(key, uid)
-			.then(() => goto(homePage))
-			.catch(() => {})
-			.finally(() => analyticsVehicleEditEvent(getFirebaseUserId()));
-	};
+	const storeAdvice = () => storeFirebaseVehicleAdviceAsync(key, uid, advice).catch(() => {});
 
 	onMount(() => {
 		const userId = getFirebaseUserId();
@@ -162,15 +128,20 @@
 		</MaterialInput>
 
 		<div class="cols-span-1 md:col-span-2 lg:col-span-4">
-			<MaterialInput bind:value={remarks} name="remarks" placeholder="Remarks">
+			<MaterialInput bind:value={remarks} name="remarks" placeholder="Remarks" disabled>
 				<IconComment />
 			</MaterialInput>
 		</div>
 
 		<div class="cols-span-1 md:col-span-2 lg:col-span-4">
-			<MaterialInput value={advice} name="advice" placeholder="Mechanic Advice" disabled>
-				<IconChatAlert />
-			</MaterialInput>
+			<div class="flex gap-4">
+				<MaterialInput bind:value={advice} name="advice" placeholder="Mechanic Advice">
+					<IconChatAlert />
+				</MaterialInput>
+				<MaterialPrimaryFab on:click={storeAdvice}>
+					<IconUpload />
+				</MaterialPrimaryFab>
+			</div>
 		</div>
 	</div>
 
@@ -199,10 +170,5 @@
 		<MaterialInput value={phone} name="phone" placeholder="Phone" disabled>
 			<IconPhone />
 		</MaterialInput>
-	</div>
-
-	<div class="flex items-center justify-center gap-8 my-5 mx-4 mt-8">
-		<MaterialSecondaryButton label="Save Changes" on:click={store} />
-		<MaterialTertiaryButton label="Delete Vehicle" on:click={remove} />
 	</div>
 </SurfaceContainer>

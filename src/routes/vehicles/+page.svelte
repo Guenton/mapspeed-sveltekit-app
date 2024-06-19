@@ -46,6 +46,7 @@
 	let engineCylinders: string = '';
 	let fuel: string = '';
 	let remarks: string = '';
+	let advice: string = '';
 	let firstName = '';
 	let lastName = '';
 	let email = '';
@@ -100,6 +101,7 @@
 			engineCylinders,
 			fuel,
 			remarks,
+			advice,
 			firstName,
 			lastName,
 			phone,

@@ -4,7 +4,7 @@ export type ServiceType = 'BASIC' | 'PREMIUM' | 'CUSTOM';
 /** SERVICE - Enum for service status */
 export type ServiceStatus =
 	| 'REQUESTED'
-	| 'APPROVED'
+	| 'ACCEPTED'
 	| 'DECLINED'
 	| 'COMPLETED'
 	| 'CANCELLED'
@@ -20,6 +20,7 @@ export type FirebaseServiceFormat = {
 	displayDate: string;
 	serviceType: ServiceType;
 	remarks: string;
+	advice: string;
 	status: ServiceStatus;
 	firstName: string;
 	lastName: string;

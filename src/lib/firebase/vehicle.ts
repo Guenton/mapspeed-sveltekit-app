@@ -87,3 +87,27 @@ export const removeFirebaseVehicleAsync = (key: string, uid: string) => {
 			throw error;
 		});
 };
+
+/** Stores Mechanic Advice for the specified vehicle */
+export const storeFirebaseVehicleAdviceAsync = (key: string, uid: string, advice: string) => {
+	if (!key) {
+		alertTypeState.set('error');
+		alertTextState.set('Vehicles/DB: ' + 'Failed to store mechanic advice, missing vehicle Key');
+		throw new Error('Failed to store mechanic advice, missing vehicle Key');
+	}
+
+	const updates: { [key: string]: string } = {};
+	updates[`vehicles/${key}/advice`] = advice;
+	updates[`user-vehicles/${uid}/${key}/advice`] = advice;
+
+	return update(ref(db), updates)
+		.then(() => {
+			alertTypeState.set('success');
+			alertTextState.set('Vehicles/DB: ' + 'Mechanic Advice Successfully Stored');
+		})
+		.catch((error) => {
+			alertTypeState.set('error');
+			alertTextState.set('Vehicles/DB: ' + error.message);
+			throw error;
+		});
+};

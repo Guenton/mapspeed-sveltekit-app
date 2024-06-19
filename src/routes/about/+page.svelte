@@ -9,12 +9,11 @@
 	import { authLoginPage, homePage } from '$utils/pages';
 	import { getFirebaseUserId, storeFirebaseFeedbackAsync } from '$lib/firebase/auth';
 	import IconAppBrackets from '~icons/mdi/application-brackets';
-	import IconUpload from '~icons/mdi/upload-circle';
+	import IconUpload from '~icons/mdi/upload';
 	import IconRfcCheck from '~icons/mdi/check-all';
-	import IconBugCheck from '~icons/mdi/bug-check';
 	import FeedbackInput from '$lib/components/inputs/FeedbackInput.svelte';
 	import LogoGuenton from '$lib/components/images/LogoGuenton.svelte';
-	import MaterialFab from '$lib/components/buttons/MaterialFab.svelte';
+	import MaterialPrimaryFab from '$lib/components/buttons/MaterialPrimaryFab.svelte';
 
 	let uid = '';
 	let feedback = '';
@@ -32,7 +31,7 @@
 <SurfaceContainer>
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-8 pb-2 mt-4 mx-4">
 		<SurfaceHeader label="Current App Version" />
-		<MaterialInput name="version" value="1.0.0">
+		<MaterialInput name="version" value="1.1.0">
 			<IconAppBrackets />
 		</MaterialInput>
 
@@ -40,16 +39,16 @@
 		<ul class="list">
 			<li>
 				<span><IconRfcCheck /></span>
-				<span class="flex-auto">Created first Alpha Release</span>
+				<span class="flex-auto">Created Admin Dashboard</span>
 			</li>
 		</ul>
 
 		<SurfaceHeader label="Feedback" />
-		<div class="flex gap-3">
+		<div class="flex gap-3 items-center">
 			<FeedbackInput bind:value={feedback} />
-			<MaterialFab on:click={sendFeedback}>
+			<MaterialPrimaryFab on:click={sendFeedback}>
 				<IconUpload />
-			</MaterialFab>
+			</MaterialPrimaryFab>
 		</div>
 
 		<SurfaceHeader label="Powered By" />

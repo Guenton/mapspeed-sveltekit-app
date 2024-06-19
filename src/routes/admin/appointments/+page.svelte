@@ -1,26 +1,27 @@
 <script lang="ts">
 	import IconAccountMultiple from '~icons/mdi/account-multiple';
+	import IconCarMultiple from '~icons/mdi/car-multiple';
 	import PageHeader from '$lib/components/content/PageHeader.svelte';
 	import SurfaceContainer from '$lib/components/containers/SurfaceContainer.svelte';
 	import SurfaceHeader from '$lib/components/content/SurfaceHeader.svelte';
+	import MaterialTertiaryButton from '$lib/components/buttons/MaterialTertiaryButton.svelte';
 
 	import type { Unsubscriber } from 'svelte/store';
 	import type { FirebaseServiceFormat, ServiceTableRowFormat } from '$lib/types/service';
+	import { Table, tableMapperValues, type TableSource } from '@skeletonlabs/skeleton';
 	import { goto } from '$app/navigation';
 	import { onDestroy, onMount } from 'svelte';
 	import { onValue } from 'firebase/database';
 	import { getFirebaseUserId } from '$lib/firebase/auth';
+	import { isAdminState } from '$lib/store/auth';
+	import { getAllServiceRef } from '$lib/firebase/service';
 	import {
 		authLoginPage,
-		servicePage,
 		homePage,
 		adminUsersPage,
 		adminAppointmentsPage,
+		adminVehiclesPage,
 	} from '$utils/pages';
-	import { Table, tableMapperValues, type TableSource } from '@skeletonlabs/skeleton';
-	import { getAllServiceRef } from '$lib/firebase/service';
-	import { isAdminState } from '$lib/store/auth';
-	import MaterialTertiaryButton from '$lib/components/buttons/MaterialTertiaryButton.svelte';
 
 	let uid = '';
 
@@ -89,8 +90,8 @@
 		<IconAccountMultiple />
 	</MaterialTertiaryButton>
 
-	<MaterialTertiaryButton label="View Vehicles">
-		<IconAccountMultiple />
+	<MaterialTertiaryButton label="View Vehicles" on:click={() => goto(adminVehiclesPage)}>
+		<IconCarMultiple />
 	</MaterialTertiaryButton>
 </div>
 

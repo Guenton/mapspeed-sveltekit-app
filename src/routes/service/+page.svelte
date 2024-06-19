@@ -40,6 +40,7 @@
 	let serviceDate: string = '';
 	let serviceType: ServiceType = 'BASIC';
 	let remarks: string = '';
+	let advice: string = '';
 	let status: ServiceStatus = 'REQUESTED';
 	let firstName = '';
 	let lastName = '';
@@ -93,6 +94,7 @@
 			serviceDate,
 			displayDate,
 			remarks,
+			advice,
 			serviceType,
 			status,
 			firstName,

@@ -4,6 +4,7 @@
 
 	export let value: string;
 	export let ref: HTMLInputElement | null = null;
+	export let disabled: boolean = false;
 
 	const minDate = new Date().toISOString().split('T')[0];
 
@@ -20,6 +21,7 @@
 		min={minDate}
 		autocomplete="off"
 		placeholder="Date"
+		{disabled}
 		bind:value
 		on:keyup={(event) => event.key === 'Enter' && enter()}
 		bind:this={ref}

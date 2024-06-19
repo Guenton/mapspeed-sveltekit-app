@@ -7,35 +7,37 @@
 	import MaterialTertiaryButton from '$lib/components/buttons/MaterialTertiaryButton.svelte';
 
 	import type { Unsubscriber } from 'svelte/store';
-	import type { FirebaseDatabaseUserFormat } from '$lib/types/auth';
+	import type { FirebaseVehicleFormat, VehicleTableRowFormat } from '$lib/types/vehicle';
+	import { Table, tableMapperValues, type TableSource } from '@skeletonlabs/skeleton';
 	import { goto } from '$app/navigation';
 	import { onDestroy, onMount } from 'svelte';
 	import { onValue } from 'firebase/database';
 	import { isAdminState } from '$lib/store/auth';
-	import { getAllUserRef, getFirebaseUserId } from '$lib/firebase/auth';
-	import { Table, tableMapperValues, type TableSource } from '@skeletonlabs/skeleton';
+	import { getFirebaseUserId } from '$lib/firebase/auth';
+	import { getAllVehicleRef } from '$lib/firebase/vehicle';
 	import { authLoginPage, homePage, adminAppointmentsPage, adminVehiclesPage } from '$utils/pages';
 
 	let uid = '';
 
-	let userTable: FirebaseDatabaseUserFormat[] = [];
+	let vehicleTable: VehicleTableRowFormat[] = [];
 
-	let unsubUsers: Unsubscriber;
+	let unsubVehicles: Unsubscriber;
 	let unsubAdminWatcher: Unsubscriber;
 
 	unsubAdminWatcher = isAdminState.subscribe((isAdmin) => {
 		if (!isAdmin) goto(homePage);
 	});
 
-	const setUserTableSource = (): TableSource => ({
-		head: ['First Name', 'Last Name', 'Email', 'Tel'],
-		body: tableMapperValues(userTable, ['firstName', 'lastName', 'email', 'phone']),
-		meta: tableMapperValues(userTable, ['uid']),
-		foot: ['Totals', `<span class="badge variant-soft-primary">${userTable.length}<span>`],
+	const setVehicleTableSource = (): TableSource => ({
+		head: ['Vin', 'Make', 'Model', 'Year', 'Fuel', 'Remarks'],
+		body: tableMapperValues(vehicleTable, ['vin', 'make', 'model', 'year', 'fuel', 'remarks']),
+		meta: tableMapperValues(vehicleTable, ['key']),
+		foot: ['Totals', `<span class="badge variant-soft-primary">${vehicleTable.length}<span>`],
 	});
-	$: userTableData = userTable && setUserTableSource();
 
-	const onuserTableRowSelect = (event: CustomEvent) => {};
+	$: vehicleTableData = vehicleTable && setVehicleTableSource();
+
+	const onTableRowSelect = (event: CustomEvent) => goto(`${adminVehiclesPage}/${event.detail}`);
 
 	onMount(() => {
 		uid = getFirebaseUserId();
@@ -44,21 +46,22 @@
 	});
 
 	onMount(() => {
-		unsubUsers = onValue(getAllUserRef(), (snapshot) => {
+		unsubVehicles = onValue(getAllVehicleRef(), (snapshot) => {
 			if (!snapshot.exists()) return;
 
-			const list: FirebaseDatabaseUserFormat[] = [];
+			const list: VehicleTableRowFormat[] = [];
 
 			snapshot.forEach((childSnapshot) => {
-				const childData = childSnapshot.val() as FirebaseDatabaseUserFormat;
-				list.push(childData);
+				const childKey = childSnapshot.key;
+				const childData = childSnapshot.val() as FirebaseVehicleFormat;
+				list.push({ key: childKey, ...childData });
 			});
 
-			userTable = list;
+			vehicleTable = list;
 		});
 	});
 
-	onDestroy(() => unsubUsers && unsubUsers());
+	onDestroy(() => unsubVehicles && unsubVehicles());
 	onDestroy(() => unsubAdminWatcher && unsubAdminWatcher());
 </script>
 
@@ -78,5 +81,5 @@
 
 <SurfaceContainer>
 	<SurfaceHeader label="Registered Users" />
-	<Table interactive source={userTableData} on:selected={onuserTableRowSelect} />
+	<Table interactive source={vehicleTableData} on:selected={onTableRowSelect} />
 </SurfaceContainer>

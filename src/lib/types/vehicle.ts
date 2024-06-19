@@ -48,6 +48,7 @@ export type FirebaseVehicleFormat = {
 	email: string;
 	phone: string;
 	remarks: string;
+	advice: string;
 };
 
 /** VEHICLE - Vehicle Table Row Format */
